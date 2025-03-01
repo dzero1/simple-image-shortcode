@@ -3,7 +3,7 @@
  * Plugin Name: Simple Image Shortcode
  * Plugin URI: http://dzero1.github.io/
  * Description: A simple shortcode to display an image with optional attributes.
- * Version: 1.0
+ * Version: 1.1
  * Author: Dananjaya
  * Author URI: http://dzero1.github.io/
  */
@@ -12,6 +12,8 @@ function simple_image_shortcode($atts) {
     $atts = shortcode_atts(
         array(
             'src' => '',
+            'href' => '',
+            'target' => '',
             'alt' => '',
             'width' => '',
             'height' => '',
@@ -21,12 +23,15 @@ function simple_image_shortcode($atts) {
         'img'
     );
 
-    if (empty($atts['src'])) {
+    // check for src and href
+    if (empty($atts['src']) || empty($atts['href'])) {
         return 'No image source provided.';
     }
 
-    $img = '<img src="' . esc_url($atts['src']) . '"';
+    // Create the image tag using the src or href attribute provided
+    $img = '<img src="' . esc_url($atts['src'] ?? $atts['href']) . '"';
 
+    // Add optional attributes
     if (!empty($atts['alt'])) {
         $img .= ' alt="' . esc_attr($atts['alt']) . '"';
     }
@@ -41,6 +46,11 @@ function simple_image_shortcode($atts) {
     }
 
     $img .= ' />';
+
+    // If href attribute is provided, wrap the image in an anchor tag
+    if (!empty($atts['href'])) {
+        $img = '<a href="' . esc_url($atts['href']) . '" target="' . esc_attr($atts['target'] ?? '_self') . '">' . $img . '</a>';
+    }
 
     return $img;
 }
